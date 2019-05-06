@@ -34,6 +34,7 @@
               label="温度" 
               style="float:left;position:absolute"
               v-model="component.temperature"
+              :disabled="!component.on"
               @change="toggleTemperature(component)"
             >温度</v-text-field>
             <v-spacer></v-spacer>
@@ -83,19 +84,19 @@ export default {
           display: '微波炉',
           buttonCaption: '加热',
           on: false,
-          notification: '空调已经关闭，关闭时间：' + this.getTime(),
+          notification: '微波炉已经关闭，关闭时间：' + this.getTime(),
         },
         {
           display: '油烟机',
           buttonCaption: '打开',
           on: false,
-          notification: '电视已经关闭，关闭时间：' + this.getTime(),
+          notification: '油烟机已经关闭，关闭时间：' + this.getTime(),
         },
         {
           display: '灯',
           buttonCaption: '打开',
           on: false,
-          notification: '电视已经关闭，关闭时间：' + this.getTime(),
+          notification: '灯已经关闭，关闭时间：' + this.getTime(),
         },
 
       ] ,

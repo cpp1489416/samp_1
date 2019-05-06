@@ -32,8 +32,10 @@
             <v-text-field 
               v-show="typeof component.temperature !== 'undefined'" 
               label="温度" 
+              width="20px"
               style="float:left;position:absolute"
               v-model="component.temperature"
+              :disabled="!component.on"
               @change="toggleTemperature(component)"
             >温度</v-text-field>
             <v-spacer></v-spacer>
@@ -91,6 +93,7 @@ export default {
         {
           display: '空调',
           on: false,
+          temperature: 26,
           notification: '空调已经关闭，关闭时间：' + this.getTime(),
         },
 

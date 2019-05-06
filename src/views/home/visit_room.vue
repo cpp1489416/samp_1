@@ -34,6 +34,7 @@
               label="温度" 
               style="float:left;position:absolute"
               v-model="component.temperature"
+              :disabled="!component.on"
               @change="toggleTemperature(component)"
             >温度</v-text-field>
             <v-spacer></v-spacer>
