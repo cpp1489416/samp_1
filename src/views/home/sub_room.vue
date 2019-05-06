@@ -12,7 +12,7 @@
           <v-img
             class="white--text"
             height="200px"
-            :src="require('@/assets/imgs/main.jpg')"
+            :src="require('@/assets/imgs/sub.jpg')"
           >
             <v-container fill-height fluid >
               <v-layout fill-height align-end>
