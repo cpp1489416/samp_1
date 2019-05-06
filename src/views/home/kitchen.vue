@@ -171,10 +171,18 @@ export default {
 
     },
     toggleYouYanJi(component) {
-
+      if (component.on) {
+        component.buttonCaption = '关闭'
+      } else {
+        component.buttonCaption = '打开'
+      }
     },
     toggleDeng(component) {
-
+      if (component.on) {
+        component.buttonCaption = '关闭'
+      } else {
+        component.buttonCaption = '打开'
+      }
     },
     toggleTemperature(component) {
       let notify = component.display + '温度已经改变，温度：' + component.temperature + '摄氏度，改变时间：' + this.getTime()
