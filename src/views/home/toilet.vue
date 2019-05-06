@@ -101,7 +101,8 @@ export default {
     getTime() {
       var date = new Date();
       var year = date.getFullYear();
-      return date.getHours() + ':' + date.getMinutes()
+      var m = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+      return date.getHours() + ':' + m
     },
     scrollToBottom() {
       this.$nextTick(() => {
