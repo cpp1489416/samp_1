@@ -102,8 +102,8 @@ export default {
       ] ,
       notifications: [
       ],
-      row_3_height: '10px'
-
+      row_3_height: '10px',
+      resizeFunction: null
     }
   },
   methods: {
@@ -193,12 +193,15 @@ export default {
   },
   mounted () {
     var that = this
-    var resize = function () {
+    this.resizeFunction = function () {
       const top = that.$refs.row_2.$el.offsetHeight + that.$refs.row_2.$el.offsetTop;
       that.row_3_height = 'calc(100% - 40px - ' + top + 'px)'
     }
-    window.addEventListener('resize', resize)
-    resize()
+    window.addEventListener('resize', this.resizeFunction)
+    this.resizeFunction()
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.resizeFunction)
   }
 }
 </script>
