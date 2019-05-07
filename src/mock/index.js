@@ -34,7 +34,7 @@ Mock.mock('api/login', /post|get/i, option => {
     msg: '',
     info: null
   }
-})
+}) 
 
 Mock.mock('api/user', /post|get/i, option => {
   console.log(option)
