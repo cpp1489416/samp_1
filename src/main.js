@@ -16,14 +16,12 @@ import '@/icons' // icon
 
 import ajax from '@/utils/ajax'
 
-import './mock'
+import '@/mock'
 
 import 'vuetify/dist/vuetify.css'
 import Vuetify from 'vuetify'
 
 Vue.use(Vuetify)
-
-// import '@/mock'
 
 Vue.use(ElementUI, { locale })
 

@@ -3,7 +3,7 @@
     <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container"/>
     <breadcrumb />
     <el-dropdown class="avatar-container" trigger="click">
-      <div class="avatar-wrapper" v-show="false">
+      <div class="avatar-wrapper">
         <img :src="user !== null ? user.avatar_url : '/static/logo.png'" class="user-avatar">
         <i class="el-icon-caret-bottom"/>
       </div>
@@ -43,7 +43,8 @@ export default {
     },
     logout () {
       this.$store.dispatch('LogOut').then(() => {
-        location.reload() // 为了重新实例化vue-router对象 避免bug
+        this.$router.push('/login')
+        // location.reload() // 为了重新实例化vue-router对象 避免bug
       })
     }
   }

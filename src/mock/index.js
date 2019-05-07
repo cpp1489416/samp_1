@@ -34,7 +34,7 @@ Mock.mock('api/login', /post|get/i, option => {
     msg: '',
     info: null
   }
-}) // 调用模拟数据方法
+})
 
 Mock.mock('api/user', /post|get/i, option => {
   console.log(option)
@@ -45,8 +45,7 @@ Mock.mock('api/user', /post|get/i, option => {
     msg: '',
     info: {
       username: 'admin',
-      name: 'admin',
-      avatar_url: '/static/log'
+      avatar_url: './static/img/avatar.png'
     }
   }
 })
