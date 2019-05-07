@@ -3,7 +3,7 @@
     <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container"/>
     <breadcrumb />
     <el-dropdown class="avatar-container" trigger="click">
-      <div class="avatar-wrapper" v-if="false">
+      <div class="avatar-wrapper" v-show="false">
         <img :src="user !== null ? user.avatar_url : '/static/logo.png'" class="user-avatar">
         <i class="el-icon-caret-bottom"/>
       </div>

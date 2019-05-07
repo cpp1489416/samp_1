@@ -62,6 +62,7 @@
 <script>
 
 import { mapGetters } from 'vuex'
+import openWindow from '@/utils/common/openWindow'
 
 export default {
   methods: {
@@ -97,7 +98,8 @@ export default {
     }
   },
   methods: {
-    back() {},
+    back() {
+    },
     getTime() {
       var date = new Date();
       var year = date.getFullYear();
