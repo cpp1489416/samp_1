@@ -2,18 +2,20 @@
   <div justify-space-between fluid grid-list-md  class="login-container">
     <el-row class="row">
       <el-col :span="8" :offset="8" class="sign-in">
-        <h4>登陆</h4>
-        <div class="input-box">
-          <div class="input-title"> 用户名: </div>
-          <input type="text" v-model="loginForm.username"/>
+        <h4>配 置</h4>
+        <div v-loading="loading">
+          <div class="input-box">
+            <div class="input-title"> url: </div>
+            <input type="text" v-model="config.url"/>
+          </div>
+          <div class="input-box">
+            <div class="input-title"> token: </div>
+            <input type="text" v-model="config.token"/>
+          </div>
         </div>
-        <div class="input-box">
-          <div class="input-title"> 密码: </div>
-          <input type="password" v-model="loginForm.password"/>
-        </div>
-        <button class="login-button" @click="handleLogin">
-          <i class="el-icon-loading" v-if="loading"></i>
-          &nbsp;登 录
+        <button class="login-button" @click="commit">
+          <i class="el-icon-loading" v-if="committing"></i>
+          &nbsp;更 新 
         </button>
       </el-col>
     </el-row>
@@ -25,28 +27,13 @@
 export default {
   name: 'Login',
   data () {
-    const validateUsername = (rule, value, callback) => {
-      callback()
-    }
-    const validatePass = (rule, value, callback) => {
-      if (value.length < 5) {
-        callback(new Error('密码不能小于5位'))
-      } else {
-        callback()
-      }
-    }
     return {
-      loginForm: {
-        username: 'admin',
-        password: 'password'
+      config: {
+        url: 'admin',
+        token: 'password'
       },
-      loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePass }]
-      },
-      loading: false,
-      pwdType: 'password',
-      redirect: undefined
+      loading: true,
+      committing: false,
     }
   },
   watch: {
@@ -59,25 +46,27 @@ export default {
       immediate: true
     }
   },
+  mounted() {
+    this.update()
+  },
   methods: {
-    showPwd () {
-      if (this.pwdType === 'password') {
-        this.pwdType = ''
-      } else {
-        this.pwdType = 'password'
-      }
-    },
-    handleLogin () {
+    async update() {
       this.loading = true
-      this.$store.dispatch('Login', this.loginForm).then((response) => {
-        this.loading = false
-        if (response.code !== '0') {
-        } else {
-          this.$router.push({ path: this.redirect || '/' })
-        }
-      }).catch(() => {
-        this.loading = false
+      await this.ajax.get('/eth').then(response => {
+        this.config = response.info
       })
+      this.loading = false
+    },
+    async commit() {
+      this.commition = true
+      await this.ajax.put('/eth', this.config).then(() => {
+        this.$notify({
+          type: 'success',
+          message: '已提交',
+          offset: 100
+        })
+      })
+      this.commiting = false
     }
   }
 }

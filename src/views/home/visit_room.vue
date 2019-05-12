@@ -1,12 +1,12 @@
 <template>
-  <v-container justify-space-between fluid grid-list-md style="height:100%; position:absolute; background-color: #f0f2f5; ">
+  <v-container justify-space-between fluid grid-list-md style="height:100%; position:absolute; ">
     <el-row :gutter="20" style="margin-bottom:10px;" ref="row_1">
       <el-col :span="24">
         <h1 class="text-md-left" style="display:inline-block;">客厅</h1>
         <v-btn color="#7986CB" dark style="position:absolute;bottom:10px;right:0;" @click="$router.back()">返回</v-btn>
       </el-col>
     </el-row>
-    <el-row :gutter="20" style="margin-bottom:40px;" ref="row_2"> 
+    <el-row :gutter="20" style="margin-bottom:40px;" ref="row_2" v-loading="loading"> 
       <el-col v-for="(component, index) in components" :key="index" :span="8  ">
         <v-card style="height:100%">
           <v-img
@@ -73,27 +73,28 @@ export default {
   },
   data() {
     return {
+      loading: true,
+      blob: null,
       components: [
         {
           name: 'light',
           display: '电灯',
           on: false,
-          notification: '电灯已经关闭，关闭时间：' + this.getTime(),
+          notification: '电灯已经关闭',
         },
         {
           name: 'airConditioner',
           display: '空调',
           on: false,
           temperature: 28,
-          notification: '空调已经关闭，关闭时间：' + this.getTime(),
+          notification: '空调已经关闭',
         },
         {
           name: 'tv',
           display: '电视',
           on: false,
-          notification: '电视已经关闭，关闭时间：' + this.getTime(),
+          notification: '电视已经关闭',
         },
-
       ] ,
       notifications: [
       ],
@@ -115,7 +116,7 @@ export default {
           container.scrollTop = container.scrollHeight;
       });
     },
-    toggleComponent(component) {
+    async toggleComponent(component) {
       let notify
       if (component.on) {
         notify = component.display + '已经关闭，关闭时间：' + this.getTime()
@@ -129,15 +130,53 @@ export default {
         }
         component.on = true
       }
+      await this.commit()
       this.notifications.push(notify)
       component.notification = notify
       this.scrollToBottom()
     },
-    toggleTemperature(component) {
+    async toggleTemperature(component) {
+      await this.commit()
       let notify = component.display + '温度已经改变，温度：' + component.temperature + '摄氏度，改变时间：' + this.getTime()
       this.notifications.push(notify)
       component.notification = notify
       this.scrollToBottom()
+    },
+    async update() {
+      this.loading = true
+      await this.ajax.get('/livingRoom').then(response => {
+        console.log(response.info)
+        this.blob = response.info
+        this.components[0].on = this.blob.light.on
+        if (this.blob.light.on) {
+          this.components[0].notification = '电灯已经打开'
+        }
+        this.components[1].on = this.blob.airConditioner.on
+        if (this.blob.airConditioner.on) {
+          this.components[1].notification = '空调已经打开'
+        }
+        this.components[1].temperature = this.blob.airConditioner.temperature
+        this.components[2].on = this.blob.tv.on
+        if (this.blob.tv.on) {
+          this.components[2].notification = '电视已经打开'
+        }
+      })
+      this.loading = false
+    },
+    async commit() {
+      this.loading = true
+      await this.ajax.put('/livingRoom', {
+        light: { on: this.components[0].on },
+        airConditioner: { on: this.components[1].on, temperature: this.components[1].temperature },
+        tv: { on: this.components[2].on }
+      }).then(() => {
+        this.$notify({
+          type: 'success',
+          message: '已提交',
+          offset: 100
+        })
+      })
+      this.loading = false
     }
   },
   mounted () {
@@ -148,6 +187,7 @@ export default {
     }
     window.addEventListener('resize', this.resizeFunction)
     this.resizeFunction()
+    this.update()
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.resizeFunction)

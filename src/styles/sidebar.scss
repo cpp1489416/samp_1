@@ -2,7 +2,7 @@
 
   // 主体区域 Main container
   .main-container {
-    min-height: 100%;
+    min-height: 300px;
     transition: margin-left .28s;
     margin-left: $sideBarWidth;
     position: relative;
@@ -15,7 +15,7 @@
     height: 100%;
     position: fixed;
     font-size: 0px;
-    top: 0;
+    top: 70px;
     bottom: 0;
     left: 0;
     z-index: 1001;
@@ -140,6 +140,7 @@
       }
     }
   }
+
 
   .withoutAnimation {
 

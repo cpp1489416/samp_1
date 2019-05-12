@@ -1,5 +1,5 @@
 <template>
-     <v-container justify-space-between fluid grid-list-md style="height:100%; position:absolute; background-color: #f0f2f5; " >
+     <v-container justify-space-between fluid grid-list-md >
        <el-row>
          <el-col>
            <h1>Smart Home</h1>
@@ -73,6 +73,4 @@ export default {
   text-align: center;
 }
 
-.el-col {
-}
 </style>

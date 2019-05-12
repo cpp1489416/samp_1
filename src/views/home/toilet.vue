@@ -1,12 +1,12 @@
 <template>
-  <v-container justify-space-between fluid grid-list-md style="height:100%; position:absolute; background-color: #f0f2f5; ">
+  <v-container justify-space-between fluid grid-list-md style="height:100%; position:absolute;">
     <el-row :gutter="20" style="margin-bottom:10px;" ref="row_1">
       <el-col :span="24">
         <h1 class="text-md-left" style="display:inline-block;">卫生间</h1>
         <v-btn color="#7986CB" dark style="position:absolute;bottom:10px;right:0;" @click="$router.back()">返回</v-btn>
       </el-col>
     </el-row>
-    <el-row :gutter="20" style="margin-bottom:40px;" ref="row_2"> 
+    <el-row :gutter="20" style="margin-bottom:40px;" ref="row_2" v-loading="loading"> 
       <el-col v-for="(component, index) in components" :key="index" :span="8  ">
         <v-card style="height:100%">
           <v-img
@@ -77,24 +77,25 @@ export default {
         {
           display: '灯',
           on: false,
-          notification: '灯已经关闭，关闭时间：' + this.getTime(),
+          notification: '灯已经关闭',
         },
         {
           display: '热水器',
           on: false,
-          notification: '热水器已经关闭，关闭时间：' + this.getTime(),
+          notification: '热水器已经关闭',
         },
         {
           display: '暖气',
           on: false,
-          notification: '暖气已经关闭，关闭时间：' + this.getTime(),
+          notification: '暖气已经关闭',
         },
 
       ] ,
       notifications: [
       ],
       row_3_height: '10px',
-      resizeFunction: null
+      resizeFunction: null,
+      loading: true
     }
   },
   methods: {
@@ -112,7 +113,7 @@ export default {
           container.scrollTop = container.scrollHeight;
       });
     },
-    toggleComponent(component) {
+    async toggleComponent(component) {
       let notify
       if (component.on) {
         notify = component.display + '已经关闭，关闭时间：' + this.getTime()
@@ -126,6 +127,7 @@ export default {
         }
         component.on = true
       }
+      await this.commit()
       this.notifications.push(notify)
       component.notification = notify
       this.scrollToBottom()
@@ -135,6 +137,33 @@ export default {
       this.notifications.push(notify)
       component.notification = notify
       this.scrollToBottom()
+    },
+    async update() {
+      this.loading = true
+      await this.ajax.get('/restroom').then(response => {
+        this.components[0].on = response.info.light.on
+        if  (response.info.light.on) { this.components[0].notification = '灯已经打开' }
+        this.components[1].on = response.info.heater.on
+        if (response.info.heater.on) { this.components[1].notification = '热水器已经打开' }
+        this.components[2].on = response.info.heating.on
+        if (response.info.heating.on) { this.components[2].notification = '暖气已经打开' }
+      })
+      this.loading =false
+    },
+    async commit() {
+      this.loading = true
+      await this.ajax.put('/restroom', {
+        light: { on: this.components[0].on },
+        heater: { on: this.components[1].on },
+        heating: { on: this.components[2].on }
+      }).then(() => {
+        this.$notify({
+          type: 'success',
+          message: '已提交',
+          offset: 100
+        })
+      })
+      this.loading = false
     }
   },
   mounted () {
@@ -145,6 +174,7 @@ export default {
     }
     window.addEventListener('resize', this.resize)
     this.resizeFunction()
+    this.update()
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.resizeFunction)
@@ -158,3 +188,4 @@ export default {
 }
 
 </style>
+

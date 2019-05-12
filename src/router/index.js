@@ -23,22 +23,32 @@ Vue.use(Router)
   }
 **/
 export const constantRouterMap = [
-  { path: '/login', component: () => import('@/views/login/index'), hidden: true },
   { path: '/register', component: () => import('@/views/login/register'), hidden: true },
   { path: '/404', component: () => import('@/views/404'), hidden: true },
   { path: '*', redirect: '/404', hidden: true },
+
   {
     path: '/',
     component: Layout,
-    redirect: '/smart_home',
     children: [{
-      path: 'smart_home',
+      path: '/',
       component: () => import('@/views/home/index'),
       name: 'Smart Home',
       meta: {title: 'Smart Home', icon: 'table'}
     }]
   },
-
+  {
+    path: '/',
+    component: Layout,
+    name: 'Login',
+    hidden: true ,
+    children: [{
+      path: 'login',
+      component: () => import('@/views/login/index'), 
+      name: '登陆',
+      meta: {title: '登陆', icon: 'table', sidebarHidden: true },
+    }]
+  },
   {
     path: '/',
     component: Layout,
@@ -92,6 +102,17 @@ export const constantRouterMap = [
       component: () => import('@/views/home/toilet'),
       name: '卫生间',
       meta: {title: '卫生间', icon: 'table'}
+    }]
+  },
+  {
+    path: '/',
+    component: Layout,
+    name: 'settings',
+    children: [{
+      path: 'settings',
+      component: () => import('@/views/home/settings'),
+      name: '卫生间',
+      meta: {title: '配置', icon: 'guide'}
     }]
   },
 ]

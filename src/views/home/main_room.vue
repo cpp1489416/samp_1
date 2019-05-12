@@ -1,12 +1,12 @@
 <template>
-  <v-container justify-space-between fluid grid-list-md style="height:100%; position:absolute; background-color: #f0f2f5; ">
+  <v-container justify-space-between fluid grid-list-md style="height:100%; position:absolute; ">
     <el-row :gutter="20" style="margin-bottom:10px;" ref="row_1">
       <el-col :span="24">
         <h1 class="text-md-left" style="display:inline-block;">主卧</h1>
         <v-btn color="#7986CB" dark style="position:absolute;bottom:10px;right:0;" @click="$router.back()">返回</v-btn>
       </el-col>
     </el-row>
-    <el-row :gutter="20" style="margin-bottom:40px;" ref="row_2"> 
+    <el-row :gutter="20" style="margin-bottom:40px;" ref="row_2" v-loading="loading"> 
       <el-col v-for="(component, index) in components" :key="index" :span="6 ">
         <v-card style="height:100%">
           <v-img
@@ -78,30 +78,31 @@ export default {
         {
           display: '灯',
           on: false,
-          notification: '灯已经关闭，关闭时间：' + this.getTime(),
+          notification: '灯已经关闭',
         },
         {
           display: '床头灯',
           on: false,
-          notification: '床头灯已经关闭，关闭时间：' + this.getTime(),
+          notification: '床头灯已经关闭'
         },
         {
           display: '电视',
           on: false,
-          notification: '电视已经关闭，关闭时间：' + this.getTime(),
+          notification: '电视已经关闭',
         },
         {
           display: '空调',
           on: false,
           temperature: 26,
-          notification: '空调已经关闭，关闭时间：' + this.getTime(),
+          notification: '空调已经关闭'
         },
 
       ] ,
       notifications: [
       ],
       row_3_height: '10px',
-      resizeFunction: null
+      resizeFunction: null,
+      loading: true
     }
   },
   methods: {
@@ -118,7 +119,7 @@ export default {
           container.scrollTop = container.scrollHeight;
       });
     },
-    toggleComponent(component) {
+    async toggleComponent(component) {
       let notify
       if (component.on) {
         notify = component.display + '已经关闭，关闭时间：' + this.getTime()
@@ -132,15 +133,47 @@ export default {
         }
         component.on = true
       }
+      await this.commit()
       this.notifications.push(notify)
       component.notification = notify
       this.scrollToBottom()
     },
-    toggleTemperature(component) {
+    async toggleTemperature(component) {
       let notify = component.display + '温度已经改变，温度：' + component.temperature + '摄氏度，改变时间：' + this.getTime()
       this.notifications.push(notify)
       component.notification = notify
+      await this.commit()
       this.scrollToBottom()
+    },
+    async update() {
+      this.loading = true
+      await this.ajax.get('/room1').then(response => {
+        this.components[0].on = response.info.light.on
+        if (response.info.light.on) { this.components[0].notification = '灯已经打开' }
+        this.components[1].on = response.info.besideLamp.on
+        if (response.info.besideLamp.on) { this.components[1].notification = '床头灯已经打开' }
+        this.components[2].on = response.info.tv.on
+        if (response.info.tv.on) { this.components[2].notification = '电视已经打开' }
+        this.components[3].on = response.info.airConditioner.on
+        if (response.info.airConditioner.on) { this.components[3].notification = '空调已经打开' }
+      })
+      this.loading =false
+    },
+    async commit() {
+      this.loading = true
+      await this.ajax.put('/room1', {
+        light: { on: this.components[0].on },
+        besideLamp: { on: this.components[1]. on },
+        tv: { on: this.components[2].on },
+        airConditioner: { on: this.components[3].on, temperature: this.components[3].temperature }
+      }).then(() => {
+        this.$notify({
+          type: 'success',
+          message: '已提交',
+          offset: 100
+        })
+      })
+      this.loading = false
     }
   },
   mounted () {
@@ -151,6 +184,7 @@ export default {
     }
     window.addEventListener('resize', this.resizeFunction)
     this.resizeFunction()
+    this.update()
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.resizeFunction)
@@ -164,3 +198,4 @@ export default {
 }
 
 </style>
+

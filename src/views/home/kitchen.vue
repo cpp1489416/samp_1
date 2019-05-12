@@ -1,12 +1,12 @@
 <template>
-  <v-container justify-space-between fluid grid-list-md style="height:100%; position:absolute; background-color: #f0f2f5; ">
+  <v-container justify-space-between fluid grid-list-md style="height:100%; position:absolute ;">
     <el-row :gutter="20" style="margin-bottom:10px;" ref="row_1">
       <el-col :span="24">
         <h1 class="text-md-left" style="display:inline-block;">厨房</h1>
         <v-btn color="#7986CB" dark style="position:absolute;bottom:10px;right:0;" @click="$router.back()">返回</v-btn>
       </el-col>
     </el-row>
-    <el-row :gutter="20" style="margin-bottom:40px;" ref="row_2"> 
+    <el-row :gutter="20" style="margin-bottom:40px;" ref="row_2" v-loading="loading"> 
       <el-col v-for="(component, index) in components" :key="index" :span="6  ">
         <v-card style="height:100%">
           <v-img
@@ -78,32 +78,33 @@ export default {
           display: '电饭煲',
           buttonCaption: '煮饭',
           on: false,
-          notification: '电饭煲已经关闭，关闭时间：' + this.getTime(),
+          notification: '电饭煲已经关闭',
         },
         {
           display: '微波炉',
           buttonCaption: '加热',
           on: false,
-          notification: '微波炉已经关闭，关闭时间：' + this.getTime(),
+          notification: '微波炉已经关闭',
         },
         {
           display: '油烟机',
           buttonCaption: '打开',
           on: false,
-          notification: '油烟机已经关闭，关闭时间：' + this.getTime(),
+          notification: '油烟机已经关闭'
         },
         {
           display: '灯',
           buttonCaption: '打开',
           on: false,
-          notification: '灯已经关闭，关闭时间：' + this.getTime(),
+          notification: '灯已经关闭',
         },
 
       ] ,
       notifications: [
       ],
       row_3_height: '10px',
-      resizeFunction: null
+      resizeFunction: null,
+      loading: true
     }
   },
   methods: {
@@ -119,7 +120,7 @@ export default {
           container.scrollTop = container.scrollHeight;
       });
     },
-    toggleComponent(component) {
+    async toggleComponent(component) {
       let notify
       if (component.on) {
         notify = component.display + '已经关闭，关闭时间：' + this.getTime()
@@ -135,6 +136,7 @@ export default {
         component.on = true
         component.buttonCaption = '打开'
       }
+      await this.commit()
       this.notifications.push(notify)
       component.notification = notify
       switch (component.display) {
@@ -189,6 +191,49 @@ export default {
       this.notifications.push(notify)
       component.notification = notify
       this.scrollToBottom()
+    },
+     async update() {
+      this.loading = true
+      await this.ajax.get('/kitchen').then(response => {
+        console.log(response.info)
+        this.components[0].on = response.info.riceCooker.on
+        if (response.info.riceCooker.on) {
+          this.components[0].notification = '正在煮饭'
+          this.components[0].buttonCaption = '关闭'
+        }
+        this.components[1].on = response.info.microwaveOven.on
+        if (response.info.microwaveOven.on) {
+          this.components[1].notification = '正在加热'
+          this.components[1].buttonCaption = '关闭'
+        }
+        this.components[2].on = response.info.lampblackMachine.on
+        if (response.info.lampblackMachine.on) {
+          this.components[2].notification = '油烟机已经打开'
+          this.components[2].buttonCaption = '关闭'
+        }
+        this.components[3].on = response.info.light.on
+        if (response.info.light.on) {
+          this.components[3].notification = '灯已经打开'
+          this.components[3].buttonCaption = '关闭'
+        }
+      })
+      this.loading = false
+    },
+    async commit() {
+      this.loading = true
+      await this.ajax.put('/kitchen', {
+        riceCooker: { on: this.components[0].on },
+        microwaveOven: { on: this.components[1].on },
+        lampblackMachine: { on: this.components[2].on },
+        light: { on: this.components[3].on },
+      }).then(() => {
+        this.$notify({
+          type: 'success',
+          message: '已提交',
+          offset: 100
+        })
+      })
+      this.loading = false
     }
   },
   mounted () {
@@ -199,6 +244,7 @@ export default {
     }
     window.addEventListener('resize', this.resizeFunction)
     this.resizeFunction()
+    this.update()
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.resizeFunction)
@@ -212,3 +258,4 @@ export default {
 }
 
 </style>
+

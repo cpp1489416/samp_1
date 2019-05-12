@@ -1,24 +1,34 @@
 <template>
   <div :class="classObj" class="app-wrapper">
-    <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside"/>
-    <sidebar class="sidebar-container"/>
-    <div class="main-container">
-      <navbar/>
+    <v-header class="header"/>
+    <div v-if="device==='mobile'&&sidebar.opened&&!this.sidebarDisabled" class="drawer-bg" @click="handleClickOutside"/>
+    <div :class="{'main-container': true, 'main-container-disable-sidebar': this.sidebarDisabled}">
+      <sidebar :class="{'sidebar-container': true, 'sidebar-disable': this.sidebarDisabled}"/>
       <app-main/>
     </div>
   </div>
 </template>
 
 <script>
-import { Navbar, Sidebar, AppMain } from './components'
+import {Header, Sidebar, AppMain } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 
 export default {
   name: 'Layout',
   components: {
-    Navbar,
+    'v-header': Header,
     Sidebar,
     AppMain
+  },
+  watch: {
+    $route() {
+      this.sidebarDisabled = (this.$route.meta.sidebarHidden === true)
+    }
+  },
+  data() {
+    return {
+      sidebarDisabled: this.$route.meta.sidebarHidden === true
+    }
   },
   mixins: [ResizeMixin],
   computed: {
@@ -41,20 +51,31 @@ export default {
     handleClickOutside () {
       this.$store.dispatch('CloseSideBar', { withoutAnimation: false })
     }
+  },
+  mounted() {
   }
 }
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-  @import "src/styles/mixin.scss";
+  // @import "src/styles/mixin.scss";
   .app-wrapper {
-    @include clearfix;
-    position: relative;
-    height: 100%;
+    //@include clearfix;
+    position: static;
+    height: 100%; 
     width: 100%;
     &.mobile.openSidebar{
       position: fixed;
       top: 0;
+    }
+    .header {
+      top: 0;
+      position: fixed;  
+      width: 100%;
+      z-index: 100000;
+    }
+    .main-container {
+      padding-top: 70px;
     }
   }
   .drawer-bg {
@@ -65,5 +86,13 @@ export default {
     height: 100%;
     position: absolute;
     z-index: 999;
+  }
+
+  .main-container-disable-sidebar {
+    margin-left: 0px !important;
+    transition: margin-left .0s !important;
+  }
+  .sidebar-disable {
+    display: none;
   }
 </style>
