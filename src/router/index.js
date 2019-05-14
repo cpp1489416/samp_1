@@ -30,16 +30,7 @@ export const constantRouterMap = [
   {
     path: '/',
     component: Layout,
-    children: [{
-      path: '/',
-      component: () => import('@/views/home/index'),
-      name: 'Smart Home',
-      meta: {title: 'Smart Home', icon: 'table'}
-    }]
-  },
-  {
-    path: '/',
-    component: Layout,
+    redirect: '/login',
     name: 'Login',
     hidden: true ,
     children: [{
@@ -47,6 +38,16 @@ export const constantRouterMap = [
       component: () => import('@/views/login/index'), 
       name: '登陆',
       meta: {title: '登陆', icon: 'table', sidebarHidden: true },
+    }]
+  },
+  {
+    path: '/',
+    component: Layout,
+    children: [{
+      path: '/smart_home',
+      component: () => import('@/views/home/index'),
+      name: 'Smart Home',
+      meta: {title: 'Smart Home', icon: 'table'}
     }]
   },
   {

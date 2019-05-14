@@ -44,6 +44,7 @@ service.interceptors.response.use(
     if (error.response.status !== 200) {
       Notification.error({
         title: 'ajax error',
+        offset: 100,
         dangerouslyUseHTMLString: true,
         message: '<span style="color:red;">' + error.response.status + ' </span>' +
           error.response.config.method.toUpperCase() + ' ' +

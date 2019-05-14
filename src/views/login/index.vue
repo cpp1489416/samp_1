@@ -73,7 +73,7 @@ export default {
         this.loading = false
         if (response.code !== '0') {
         } else {
-          this.$router.push({ path: this.redirect || '/' })
+          this.$router.push({ path: this.redirect || '/smart_home' })
         }
       }).catch(() => {
         this.loading = false

@@ -90,7 +90,7 @@ export default {
       this.$store.dispatch('ToggleSideBar')
     },
     updateCategories() {
-      if (this.$route.path === '/') {
+      if (this.$route.path === '/smart_home') {
         this.categories[0].selected = true
         this.categories[1].hidden = true
         this.categories[2].selected = false
@@ -108,7 +108,7 @@ export default {
     },
     jumpToCategory(category) {
       if (category.name === 'Home') {
-        this.$router.push('/')
+        this.$router.push('/smart_home')
       } else if (category.name === '配置') {
         this.$router.push('/settings')
       }
