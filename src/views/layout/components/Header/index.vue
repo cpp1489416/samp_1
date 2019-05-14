@@ -25,9 +25,9 @@
               <div class="dropdown-content right-align">
                 <div class="user-container">
                   <img :src="user !== null ? user.avatar_url : '/static/logo.png'"> 
-                  <router-link tag="span" to="/">您好，{{user.username}}</router-link>
+                  <router-link tag="span" to="/smart_home">您好，{{user.username}}</router-link>
                 </div>
-                <router-link to="/" tag="a" class="emphasis">
+                <router-link to="/smart_home" tag="a" class="emphasis">
                   主页 
                 </router-link>
                 <a href="javascript:void(0);" @click="logout"> 注销 </a>
