@@ -45,7 +45,8 @@
       </el-col>
     </el-row>
     <el-row ref="row_3" :span="20" :style="{height:row_3_height}"> 
-      <el-col :span="24" style="height:100%">
+      <el-col :span="24" style="height:100%" v-loading="loading">
+        <v-btn style="position:absolute; z-index:10000; right:25px; top:10px;" @click="clearHistory">清空历史记录</v-btn>
         <v-card style="height:100%;overflow-y:scroll" ref="notifications">
           <v-list>
             <template v-for="(item, index) in notifications">
@@ -120,6 +121,7 @@ export default {
       });
     },
     async toggleComponent(component) {
+      this.loading = true
       let notify
       if (component.on) {
         notify = component.display + '已经关闭，关闭时间：' + this.getTime()
@@ -133,8 +135,8 @@ export default {
         }
         component.on = true
       }
-      await this.commit()
       this.notifications.push(notify)
+      await this.commit()
       component.notification = notify
       this.scrollToBottom()
     },
@@ -156,6 +158,7 @@ export default {
         if (response.info.tv.on) { this.components[2].notification = '电视已经打开' }
         this.components[3].on = response.info.airConditioner.on
         if (response.info.airConditioner.on) { this.components[3].notification = '空调已经打开' }
+        this.notifications = response.info.history
       })
       this.loading =false
     },
@@ -165,7 +168,8 @@ export default {
         light: { on: this.components[0].on },
         besideLamp: { on: this.components[1]. on },
         tv: { on: this.components[2].on },
-        airConditioner: { on: this.components[3].on, temperature: this.components[3].temperature }
+        airConditioner: { on: this.components[3].on, temperature: this.components[3].temperature },
+        history: this.notifications
       }).then(() => {
         this.$notify({
           message: '已提交',
@@ -173,6 +177,12 @@ export default {
           offset: 100
         })
       })
+      this.loading = false
+    },
+    async clearHistory() {
+      this.loading = true
+      this.notifications = []
+      await this.commit()
       this.loading = false
     }
   },

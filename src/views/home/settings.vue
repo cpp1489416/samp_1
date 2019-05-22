@@ -54,6 +54,9 @@ export default {
       this.loading = true
       await this.ajax.get('/eth').then(response => {
         this.config = response.info
+        if (this.config.url === '' || this.config.url === null) {
+          this.config.url = 'http://localhost:8545'
+        }
       })
       this.loading = false
     },

@@ -44,7 +44,8 @@
       </el-col>
     </el-row>
     <el-row ref="row_3" :span="20" :style="{height:row_3_height}"> 
-      <el-col :span="24" style="height:100%">
+      <el-col :span="24" style="height:100%" v-loading="loading">
+        <v-btn style="position:absolute; z-index:10000; right:25px; top:10px;" @click="clearHistory">清空历史记录</v-btn>
         <v-card style="height:100%;overflow-y:scroll" ref="kitchenNotifications">
           <v-list>
             <template v-for="(item, index) in notifications">
@@ -121,6 +122,7 @@ export default {
       });
     },
     async toggleComponent(component) {
+      this.loading = true
       let notify
       if (component.on) {
         notify = component.display + '已经关闭，关闭时间：' + this.getTime()
@@ -136,7 +138,6 @@ export default {
         component.on = true
         component.buttonCaption = '打开'
       }
-      await this.commit()
       this.notifications.push(notify)
       component.notification = notify
       switch (component.display) {
@@ -154,6 +155,7 @@ export default {
           break;
       }
       this.scrollToBottom()
+      await this.commit()
     },
     toggleDianFanBao(component) {
       if (component.on) {
@@ -216,6 +218,10 @@ export default {
           this.components[3].notification = '灯已经打开'
           this.components[3].buttonCaption = '关闭'
         }
+        this.notifications = []
+        for (const i in response.info.history) {
+          this.notifications[i] = response.info.history[i]
+        }
       })
       this.loading = false
     },
@@ -226,6 +232,7 @@ export default {
         microwaveOven: { on: this.components[1].on },
         lampblackMachine: { on: this.components[2].on },
         light: { on: this.components[3].on },
+        history: this.notifications
       }).then(() => {
         this.$notify({
           type: 'success',
@@ -233,6 +240,12 @@ export default {
           offset: 100
         })
       })
+      this.loading = false
+    },
+    async clearHistory() {
+      this.loading = true
+      this.notifications = []
+      this.commit()
       this.loading = false
     }
   },
